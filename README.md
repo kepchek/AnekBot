@@ -1,2 +1,2 @@
 # AnekBot
- Telegram bot with some anecdotes
+ Телеграм бот, с анекдотами
