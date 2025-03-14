@@ -13,58 +13,46 @@ using System.Threading.Tasks;
 class Program
 {
 
-    // Это клиент для работы с Telegram Bot API, который позволяет отправлять сообщения, управлять ботом, подписываться на обновления и многое другое.
     private static ITelegramBotClient _botClient;
 
-    // Это объект с настройками работы бота. Здесь мы будем указывать, какие типы Update мы будем получать, Timeout бота и так далее.
     private static ReceiverOptions _receiverOptions;
 
     static async Task Main()
     {
 
-        _botClient = new TelegramBotClient("7275747390:AAE7Rbgle7itlNhyhrqW04eTc4z2aGdFGAI"); // Присваиваем нашей переменной значение, в параметре передаем Token, полученный от BotFather
-        _receiverOptions = new ReceiverOptions // Также присваем значение настройкам бота
+        _botClient = new TelegramBotClient("7275747390:AAE7Rbgle7itlNhyhrqW04eTc4z2aGdFGAI"); 
+        _receiverOptions = new ReceiverOptions 
         {
-            AllowedUpdates = new[] // Тут указываем типы получаемых Update`ов, о них подробнее расказано тут https://core.telegram.org/bots/api#update
+            AllowedUpdates = new[] 
             {
-                UpdateType.Message, // Сообщения (текст, фото/видео, голосовые/видео сообщения и т.д.)
+                UpdateType.Message, 
             },
-            // Параметр, отвечающий за обработку сообщений, пришедших за то время, когда ваш бот был оффлайн
-            // True - не обрабатывать, False (стоит по умолчанию) - обрабаывать
+            
             ThrowPendingUpdates = true,
         };
 
         using var cts = new CancellationTokenSource();
 
-        // UpdateHander - обработчик приходящих Update`ов
-        // ErrorHandler - обработчик ошибок, связанных с Bot API
-        _botClient.StartReceiving(UpdateHandler, ErrorHandler, _receiverOptions, cts.Token); // Запускаем бота
+        _botClient.StartReceiving(UpdateHandler, ErrorHandler, _receiverOptions, cts.Token); 
 
-        var me = await _botClient.GetMeAsync(); // Создаем переменную, в которую помещаем информацию о нашем боте.
+        var me = await _botClient.GetMeAsync();
         Console.WriteLine($"{me.FirstName} запущен!");
 
-        await Task.Delay(-1); // Устанавливаем бесконечную задержку, чтобы наш бот работал постоянно
+        await Task.Delay(-1); 
     }
     private static async Task UpdateHandler(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
     {
-        // Обязательно ставим блок try-catch, чтобы наш бот не "падал" в случае каких-либо ошибок
         try
         {
-            // Сразу же ставим конструкцию switch, чтобы обрабатывать приходящие Update
             switch (update.Type)
             {
                 case UpdateType.Message:
                     {
-                        // эта переменная будет содержать в себе все связанное с сообщениями
                         var message = update.Message;
-
-                        // From - это от кого пришло сообщение (или любой другой Update)
                         var user = message.From;
 
-                        // Выводим на экран то, что пишут нашему боту, а также небольшую информацию об отправителе
                         Console.WriteLine($"{user.FirstName} ({user.Id}) написал сообщение: {message.Text}");
 
-                        // Chat - содержит всю информацию о чате
                         var chat = message.Chat;
                         switch(message.Type)
                         {
@@ -91,7 +79,7 @@ class Program
                                         await botClient.SendTextMessageAsync(
                                             chat.Id,
                                             "Кайфуйте",
-                                            replyMarkup: replyKeyboard); // опять передаем клавиатуру в параметр replyMarkup
+                                            replyMarkup: replyKeyboard); 
 
                                         return;
                                         }
@@ -158,7 +146,6 @@ class Program
 
     private static Task ErrorHandler(ITelegramBotClient botClient, Exception error, CancellationToken cancellationToken)
     {
-        // Тут создадим переменную, в которую поместим код ошибки и её сообщение 
         var ErrorMessage = error switch
         {
             ApiRequestException apiRequestException
